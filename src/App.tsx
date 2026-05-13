@@ -310,7 +310,7 @@ const TaskStatusSelector = ({ status, onUpdate, disabled }: { status: any, onUpd
       onChange={(e) => onUpdate(e.target.value)}
       disabled={disabled}
       className={cn(
-        "bg-[var(--bg-page)] border border-[var(--border)] rounded px-2 py-1 text-[9px] font-black uppercase outline-none transition-all cursor-pointer",
+        "bg-[#020617] border border-slate-800 rounded px-2 py-1 text-[9px] font-black uppercase outline-none focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer w-full shadow-lg",
         status === TaskStatus.DONE ? "text-emerald-400" : 
         (status === TaskStatus.ON_HOLD) ? "text-amber-400" :
         (status === TaskStatus.ON_QUEUE) ? "text-[#9e18c8]" :
@@ -318,7 +318,11 @@ const TaskStatusSelector = ({ status, onUpdate, disabled }: { status: any, onUpd
         "text-[var(--text-sub)]"
       )}
     >
-      {options.map((opt, i) => <option key={getSafeKey({id: opt}, i, 'task-status-opt')} value={opt}>{opt}</option>)}
+      {options.map((opt, i) => (
+        <option key={getSafeKey({id: opt}, i, 'task-status-opt')} value={opt} className="bg-[#020617] text-white">
+          {opt}
+        </option>
+      ))}
     </select>
   );
 };
@@ -1294,7 +1298,7 @@ export default function App() {
     // --- EXECUTE PRIMARY UPDATE ---
     try {
        const actorName = currentUser?.name || user?.name || user?.email || 'User';
-       const sanitizedVal = (field === 'start_time' || field === 'end_time' || field === 'target_sla_date') 
+       const sanitizedVal = (field === 'start_time' || field === 'end_time' || field === 'target_sla_date' || field === 'realized_finish') 
          ? sanitizeDate(value) 
          : value;
 
@@ -8186,21 +8190,13 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
           </td>
 
           {/* Status */}
-          <td className="px-4 py-4 relative z-[60]" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-center">
-              <select 
-                value={task.status || "TODO"}
+          <td className="px-4 py-4 relative z-[50]" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-center w-full">
+              <TaskStatusSelector 
+                status={task.status} 
+                onUpdate={(v) => handleLiveUpdate(task.id, 'status', v)}
                 disabled={disabled || !hasControl || !task.realized_finish}
-                onChange={(e) => handleLiveUpdate(task.id, 'status', e.target.value)}
-                className={cn(
-                  "bg-[#020617] border border-slate-800 focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[9px] font-black uppercase transition-all",
-                  (!task.realized_finish || disabled || !hasControl) ? 'opacity-50 cursor-not-allowed text-slate-500' : 'cursor-pointer text-emerald-400'
-                )}
-              >
-                {['TODO', 'IN PROGRESS', 'ON HOLD', 'ON QUEUE', 'DONE'].map(s => (
-                  <option key={s} value={s} className="bg-[#020617]">{s}</option>
-                ))}
-              </select>
+              />
             </div>
           </td>
 
@@ -8644,12 +8640,7 @@ function MobileTaskEditModal({ task, onClose, onUpdate }: { task: Task, onClose:
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Realized Finish Date (Optional)</label>
             <CustomDatePicker 
               selectedDate={formData.realized_finish}
-              minDate={formData.start_time ? new Date(formData.start_time) : undefined}
               onChange={date => {
-                if (date && formData.start_time && date < formData.start_time) {
-                  alert(`VALIDATION ERROR: Realized Finish tidak boleh mendahului Plan Start (${formData.start_time})`);
-                  return;
-                }
                 setFormData(p => ({ ...p, realized_finish: date || '' }));
               }}
               className="w-full bg-slate-900 border border-indigo-500/30 rounded-2xl px-4 py-4 text-white font-bold outline-none focus:border-indigo-500 transition-all font-mono"

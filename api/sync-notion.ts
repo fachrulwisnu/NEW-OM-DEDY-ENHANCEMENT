@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
+import { ENV } from '../src/config';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  ENV.supabase.url || 'https://placeholder.supabase.co',
+  ENV.supabase.key || 'placeholder'
+);
 
 function getPropertyValue(prop: any): any {
   if (!prop) return null;
@@ -49,8 +51,8 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const databaseId = process.env.NOTION_DATABASE_ID;
-    const notionKey = process.env.NOTION_API_KEY;
+    const databaseId = ENV.notion.dbId;
+    const notionKey = ENV.notion.key;
 
     if (!databaseId || !notionKey) {
       return res.status(400).json({ 

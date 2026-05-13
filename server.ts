@@ -4,8 +4,9 @@ import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
-
 dotenv.config();
+
+import { ENV } from "./src/config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,10 +16,11 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Initialize Supabase
-const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Initialize Supabase with fail-safe ENV
+const supabase = createClient(
+  ENV.supabase.url || 'https://placeholder.supabase.co',
+  ENV.supabase.key || 'placeholder'
+);
 
 // Helper to find Notion property by keyword
 const getVal = (props: any, keyword: string) => {
@@ -85,7 +87,7 @@ app.get("/health", (req, res) => {
 app.post("/webhook-kaldev", async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
-  const secretToken = process.env.KALDEV_SECRET_TOKEN;
+  const secretToken = ENV.kaldev;
 
   // For testing, if secretToken is not set in env, we might want to warn
   if (!secretToken) {
@@ -130,8 +132,8 @@ app.post("/sync-notion", async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const databaseId = process.env.NOTION_DATABASE_ID;
-    const notionKey = process.env.NOTION_API_KEY;
+    const databaseId = ENV.notion.dbId;
+    const notionKey = ENV.notion.key;
 
     if (!databaseId || !notionKey) {
       return res.status(400).json({ 
