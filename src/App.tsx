@@ -92,6 +92,7 @@ import { canEditTask } from './utils/permissionHelper';
 import { Task, ViewScale, TaskStatus, ProjectStatus, Project, AppUser, AppView, AuditLog, Schedule, ProjectRescheduleLog, RescheduleRequest, MasterProject, MasterProjectAuditLog, HistoryEditProject } from './types';
 import { cn } from './lib/utils';
 import { getSafeKey } from './utils/keyHelper';
+import { debounce } from 'lodash';
 import ProjectDetail from './components/ProjectDetail';
 
 /**
@@ -1318,15 +1319,6 @@ export default function App() {
        if (field === 'status' && sanitizedVal === TaskStatus.DONE) {
           if (!task.realized_finish) {
              alert("VALIDATION ERROR: Status 'Done' wajib mengisi 'Realized Finish Date'.");
-             return;
-          }
-       }
-
-       if (field === 'realized_finish' && sanitizedVal) {
-          const checkStart = task.start_time;
-          if (checkStart && sanitizedVal < checkStart) {
-             const dateStr = format(new Date(checkStart), 'dd/MM/yyyy');
-             alert(`VALIDATION ERROR: Realized Finish Date tidak boleh lebih kecil dari Plan Start Date (${dateStr}).`);
              return;
           }
        }
@@ -7842,6 +7834,64 @@ function AuditLogTable({ logs }: { logs: ProjectRescheduleLog[] }) {
   );
 }
 
+function DebouncedInput({ value, onChange, className, placeholder, disabled }: { value: string, onChange: (v: string) => void, className?: string, placeholder?: string, disabled?: boolean }) {
+  const [localValue, setLocalValue] = useState(value || "");
+
+  useEffect(() => {
+    setLocalValue(value || "");
+  }, [value]);
+
+  const debouncedChange = useMemo(
+    () => debounce((v: string) => onChange(v), 500),
+    [onChange]
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+    debouncedChange(e.target.value);
+  };
+
+  return (
+    <input
+      type="text"
+      value={localValue}
+      onChange={handleChange}
+      className={className}
+      placeholder={placeholder}
+      disabled={disabled}
+    />
+  );
+}
+
+function DebouncedTextarea({ value, onChange, className, placeholder, disabled, rows }: { value: string, onChange: (v: string) => void, className?: string, placeholder?: string, disabled?: boolean, rows?: number }) {
+  const [localValue, setLocalValue] = useState(value || "");
+
+  useEffect(() => {
+    setLocalValue(value || "");
+  }, [value]);
+
+  const debouncedChange = useMemo(
+    () => debounce((v: string) => onChange(v), 500),
+    [onChange]
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setLocalValue(e.target.value);
+    debouncedChange(e.target.value);
+  };
+
+  return (
+    <textarea
+      value={localValue}
+      onChange={handleChange}
+      className={className}
+      placeholder={placeholder}
+      disabled={disabled}
+      rows={rows}
+    />
+  );
+}
+
 function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onToggleExpand, onUpdateTask, onOpenAudit, onAddSubTask, onDeleteTask, disabled, isMobile, revertCount }: any) {
   
   const handleLiveUpdate = (id: string, field: string, value: any) => {
@@ -8064,10 +8114,9 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
           
           {/* Dev Column */}
           <td className="px-4 py-4 relative z-10" onClick={e => e.stopPropagation()}>
-            <input 
-              type="text"
+            <DebouncedInput 
               value={task.dev_name || ""}
-              onChange={(e) => handleLiveUpdate(task.id, 'dev_name', e.target.value)}
+              onChange={(v) => handleLiveUpdate(task.id, 'dev_name', v)}
               className={cn(
                 "bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[10px] font-mono text-center text-[var(--accent)]",
                 (disabled || !hasControl) && "opacity-50 cursor-not-allowed"
@@ -8079,10 +8128,9 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
 
           {/* QA Column */}
           <td className="px-4 py-4 relative z-10" onClick={e => e.stopPropagation()}>
-            <input 
-              type="text"
+            <DebouncedInput 
               value={task.qa_name || ""}
-              onChange={(e) => handleLiveUpdate(task.id, 'qa_name', e.target.value)}
+              onChange={(v) => handleLiveUpdate(task.id, 'qa_name', v)}
               className={cn(
                 "bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[10px] font-mono text-center text-purple-400",
                 (disabled || !hasControl) && "opacity-50 cursor-not-allowed"
@@ -8138,14 +8186,14 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
           </td>
 
           {/* Status */}
-          <td className="px-4 py-4 relative z-10" onClick={e => e.stopPropagation()}>
+          <td className="px-4 py-4 relative z-[60]" onClick={e => e.stopPropagation()}>
             <div className="flex justify-center">
               <select 
                 value={task.status || "TODO"}
                 disabled={disabled || !hasControl || !task.realized_finish}
                 onChange={(e) => handleLiveUpdate(task.id, 'status', e.target.value)}
                 className={cn(
-                  "bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[9px] font-black uppercase transition-all",
+                  "bg-[#020617] border border-slate-800 focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[9px] font-black uppercase transition-all",
                   (!task.realized_finish || disabled || !hasControl) ? 'opacity-50 cursor-not-allowed text-slate-500' : 'cursor-pointer text-emerald-400'
                 )}
               >
@@ -8162,14 +8210,14 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
                 <div className="flex flex-col gap-0.5 min-w-[30px]">
                   <ApprovalBadge value={task.approval_fachrul} label="F" onUpdate={(v) => handleLiveUpdate(task.id, 'approval_fachrul', v)} disabled={disabled || !hasControl} />
                 </div>
-                <textarea 
+                <DebouncedTextarea 
                   className={cn(
                     "bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[9px] dark:text-white resize-none h-8 font-medium leading-tight",
                     (disabled || !hasControl) && "opacity-50 cursor-not-allowed"
                   )}
                   rows={1}
                   value={task.fachrul_feedback || ""}
-                  onChange={(e) => handleLiveUpdate(task.id, 'fachrul_feedback', e.target.value)}
+                  onChange={(v) => handleLiveUpdate(task.id, 'fachrul_feedback', v)}
                   placeholder="Feedback..."
                   disabled={disabled || !hasControl}
                 />
@@ -8182,14 +8230,14 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
                 <div className="flex flex-col gap-0.5 min-w-[30px]">
                   <ApprovalBadge value={task.approval_barra} label="B" onUpdate={(v) => handleLiveUpdate(task.id, 'approval_barra', v)} disabled={disabled || !hasControl} />
                 </div>
-                <textarea 
+                <DebouncedTextarea 
                   className={cn(
                     "bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1 w-full text-[9px] dark:text-white resize-none h-8 font-medium leading-tight",
                     (disabled || !hasControl) && "opacity-50 cursor-not-allowed"
                   )}
                   rows={1}
                   value={task.barra_feedback || ""}
-                  onChange={(e) => handleLiveUpdate(task.id, 'barra_feedback', e.target.value)}
+                  onChange={(v) => handleLiveUpdate(task.id, 'barra_feedback', v)}
                   placeholder="Feedback..."
                   disabled={disabled || !hasControl}
                 />
@@ -9136,16 +9184,16 @@ function GanttBar({ user, task, tasks, projects, setTasks, scale, gridStart, gri
   const statusColors = useMemo(() => {
     switch (task.status) {
       case TaskStatus.DONE:
-        return "from-emerald-500 to-teal-600 shadow-emerald-500/40";
+        return "bg-[#10b981] shadow-emerald-500/40";
       case TaskStatus.IN_PROGRESS:
-        return "from-blue-500 to-indigo-600 shadow-blue-500/40";
+        return "bg-[#3b82f6] shadow-blue-500/40";
       case TaskStatus.ON_HOLD:
-        return "from-amber-400 to-orange-600 shadow-amber-500/40";
+        return "bg-[#f59e0b] shadow-amber-500/40";
       case TaskStatus.ON_QUEUE:
-        return "from-[#dd6cf7] to-[#9e18c8] shadow-[#9e18c8]/40";
+        return "bg-[#6366f1] shadow-[#6366f1]/40";
       case TaskStatus.TODO:
       default:
-        return "from-slate-500 to-slate-600 shadow-slate-500/40";
+        return "bg-[#64748b] shadow-slate-500/40";
     }
   }, [task.status]);
 
@@ -9165,19 +9213,19 @@ function GanttBar({ user, task, tasks, projects, setTasks, scale, gridStart, gri
         }}
         transition={{ type: "spring", stiffness: 400, damping: 40 }}
         onPointerDown={handlePointerDown}
+        onMouseEnter={() => !isProjectBar && setShowPopover(true)}
+        onMouseLeave={() => setShowPopover(false)}
         onClick={(e) => {
           if (isProjectBar && onSetFocus) {
             e.stopPropagation();
             onSetFocus(task.id);
-          } else {
-            setShowPopover(!showPopover);
           }
         }}
         className={cn(
           "absolute rounded-lg flex items-center px-4 shadow-xl select-none transition-all duration-300",
           isDragging && "ring-2 ring-white/50 z-[100]",
           statusColors,
-          health === 'OVERDUE' && task.status !== TaskStatus.DONE && "from-rose-500 to-red-700 shadow-rose-500/40",
+          health === 'OVERDUE' && task.status !== TaskStatus.DONE && "bg-rose-500 shadow-rose-500/40",
           "h-8 border border-white/10 hover:backdrop-brightness-110 active:scale-[0.98] cursor-pointer"
         )}
       >
