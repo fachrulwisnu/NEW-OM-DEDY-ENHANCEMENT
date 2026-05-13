@@ -296,6 +296,7 @@ const StatusBadge = ({ status, type = 'task' }: { status: string, type?: 'projec
 };
 
 const TaskStatusSelector = ({ status, onUpdate, disabled }: { status: any, onUpdate: (s: any) => void, disabled?: boolean }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const options = [
     TaskStatus.TODO,
     TaskStatus.IN_PROGRESS,
@@ -303,14 +304,29 @@ const TaskStatusSelector = ({ status, onUpdate, disabled }: { status: any, onUpd
     TaskStatus.ON_QUEUE,
     TaskStatus.DONE
   ];
-  if (disabled) return <StatusBadge status={status} />;
+
+  if (disabled || !isEditing) {
+    return (
+      <div 
+        onClick={() => !disabled && setIsEditing(true)}
+        className="cursor-pointer hover:scale-105 transition-transform"
+      >
+        <StatusBadge status={status} />
+      </div>
+    );
+  }
+
   return (
     <select 
+      autoFocus
+      onBlur={() => setIsEditing(false)}
       value={status || TaskStatus.TODO}
-      onChange={(e) => onUpdate(e.target.value)}
-      disabled={disabled}
+      onChange={(e) => {
+        onUpdate(e.target.value);
+        setIsEditing(false);
+      }}
       className={cn(
-        "bg-[#020617] border border-slate-800 rounded px-2 py-1 text-[9px] font-black uppercase outline-none focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer w-full shadow-lg",
+        "bg-[#020617] border border-slate-800 rounded px-2 py-1 text-[9px] font-black uppercase outline-none focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer w-full shadow-lg pointer-events-auto",
         status === TaskStatus.DONE ? "text-emerald-400" : 
         (status === TaskStatus.ON_HOLD) ? "text-amber-400" :
         (status === TaskStatus.ON_QUEUE) ? "text-[#9e18c8]" :
@@ -453,7 +469,7 @@ const ConfirmModal = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -523,7 +539,7 @@ const SuccessNotification = ({ show, message, onClose }: { show: boolean, messag
           initial={{ opacity: 0, y: -50, x: '-50%' }}
           animate={{ opacity: 1, y: 0, x: '-50%' }}
           exit={{ opacity: 0, y: -50, x: '-50%' }}
-          className="fixed top-8 left-1/2 z-[150] bg-emerald-500 text-white px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(16,185,129,0.4)] flex items-center gap-3 border border-emerald-400"
+          className="fixed top-8 left-1/2 z-[160] bg-emerald-500 text-white px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(16,185,129,0.4)] flex items-center gap-3 border border-emerald-400"
         >
           <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
             <Plus className="w-3 h-3 rotate-45" />
@@ -691,7 +707,7 @@ const ProfileSettingsModal = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -2500,7 +2516,7 @@ function OwnershipWarningModal({ picName, itemName, type, onConfirm, onCancel }:
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -4108,7 +4124,7 @@ function BatchManualEntryModal({ onClose, onSuccess, users }: { onClose: () => v
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={onClose} className="absolute inset-0 bg-slate-950/90 backdrop-blur-md" />
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 30 }}
@@ -5326,7 +5342,7 @@ function OmDedySchedule({ user, users, setActiveView, isAdmin, isSuperadmin, set
 
       {/* Legend and Modals */}
       {requestModal && (
-        <div className="fixed inset-0 z-[200] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
            <motion.div 
              initial={{ opacity: 0, scale: 0.95, y: 20 }}
              animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -5516,7 +5532,7 @@ function OmDedySchedule({ user, users, setActiveView, isAdmin, isSuperadmin, set
       )}
 
       {showRescheduleRequests && (
-        <div className="fixed inset-0 z-[200] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
            <motion.div 
              initial={{ opacity: 0, scale: 0.95, y: 20 }}
              animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -6957,7 +6973,7 @@ function AddPersonnelModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -7088,7 +7104,7 @@ function EditPersonnelModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -7591,7 +7607,7 @@ function AuditLogView({ logs, projects, users, isMobile }: { logs: AuditLog[], p
 
       <AnimatePresence>
         {selectedLog && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -8190,7 +8206,7 @@ function GanttTree({ user, users, roots, map, tasks, projects, expandedRows, onT
           </td>
 
           {/* Status */}
-          <td className="px-4 py-4 relative z-[50]" onClick={e => e.stopPropagation()}>
+          <td className="px-4 py-4 relative z-[30] overflow-visible" onClick={e => e.stopPropagation()}>
             <div className="flex justify-center w-full">
               <TaskStatusSelector 
                 status={task.status} 
@@ -8560,7 +8576,7 @@ function MobileTaskEditModal({ task, onClose, onUpdate }: { task: Task, onClose:
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950">
       <motion.div 
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
