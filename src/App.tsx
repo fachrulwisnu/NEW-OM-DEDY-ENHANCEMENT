@@ -7671,23 +7671,23 @@ const DeferredTextarea = ({ value, onSave, className, placeholder, disabled }: {
 
 function SystemLogTable({ logs }: { logs: AuditLog[] }) {
   if (!logs || logs.length === 0) {
-    return <div className="text-center py-10 text-slate-500 font-bold uppercase text-[10px] tracking-widest border border-dashed border-slate-800 rounded-2xl">No system logs recorded</div>;
+    return <div className="text-center py-10 text-[var(--text-sub)] font-bold uppercase text-[10px] tracking-widest border border-dashed border-[var(--border)] rounded-2xl">No system logs recorded</div>;
   }
   return (
-    <div className="overflow-hidden bg-white rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+    <div className="overflow-hidden bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] shadow-sm">
       <table className="w-full text-left border-collapse">
-        <thead className="bg-[var(--bg-main)] sticky top-0 z-10 border-b border-[var(--border-subtle)]">
+        <thead className="bg-[var(--bg-page)] sticky top-0 z-10 border-b border-[var(--border)]">
           <tr>
             <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest">Action</th>
             <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest text-center">Auth By</th>
             <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest text-right">Timestamp</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[var(--border-subtle)]">
+        <tbody className="divide-y divide-[var(--border)]">
           {logs.map((log) => (
-            <tr key={log.id} className="hover:bg-[var(--bg-main)] transition-colors group">
+            <tr key={log.id} className="hover:bg-[var(--bg-page)] transition-colors group">
               <td className="px-6 py-4">
-                <span className="text-[11px] font-black text-[var(--text-main)] uppercase tracking-tight group-hover:text-[var(--primary)] transition-colors">{log.action || 'INTERNAL OPERATION'}</span>
+                <span className="text-[11px] font-black text-[var(--text-main)] uppercase tracking-tight group-hover:text-[var(--accent)] transition-colors">{log.action || 'INTERNAL OPERATION'}</span>
               </td>
               <td className="px-6 py-4 text-center">
                 <span className="text-[10px] font-black text-[var(--success)] bg-[var(--success)]/10 px-3 py-1 rounded-full border border-[var(--success)]/20 uppercase tracking-widest">
@@ -7709,13 +7709,13 @@ function SystemLogTable({ logs }: { logs: AuditLog[] }) {
 
 function HistoryEditTable({ logs, users }: { logs: HistoryEditProject[], users: AppUser[] }) {
   if (!logs || logs.length === 0) {
-    return <div className="text-center py-10 text-slate-500 font-bold uppercase text-[10px] tracking-widest border border-dashed border-slate-800 rounded-2xl">No user edits recorded</div>;
+    return <div className="text-center py-10 text-[var(--text-sub)] font-bold uppercase text-[10px] tracking-widest border border-dashed border-[var(--border)] rounded-2xl">No user edits recorded</div>;
   }
   return (
-    <div className="overflow-hidden bg-white rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+    <div className="overflow-hidden bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] shadow-sm">
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[800px]">
-          <thead className="bg-[var(--bg-main)] sticky top-0 z-10 border-b border-[var(--border-subtle)]">
+          <thead className="bg-[var(--bg-page)] sticky top-0 z-10 border-b border-[var(--border)]">
             <tr>
               <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest w-[150px]">PIC Name</th>
               <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest text-center w-[120px]">Date</th>
@@ -7724,16 +7724,16 @@ function HistoryEditTable({ logs, users }: { logs: HistoryEditProject[], users: 
               <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest">After</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--border-subtle)]">
+          <tbody className="divide-y divide-[var(--border)]">
             {logs.map((log) => {
               const actorName = users.find(u => u.email === log.pic_name)?.name || log.pic_name;
               
               return (
-                <tr key={log.id} className="hover:bg-[var(--bg-main)] transition-colors group">
+                <tr key={log.id} className="hover:bg-[var(--bg-page)] transition-colors group">
                   <td className="px-6 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-[var(--primary)]/10 flex items-center justify-center border border-[var(--primary)]/20">
-                        <UserIcon className="w-3 h-3 text-[var(--primary)]" />
+                      <div className="w-6 h-6 rounded bg-[var(--accent)]/10 flex items-center justify-center border border-[var(--accent)]/20">
+                        <UserIcon className="w-3 h-3 text-[var(--accent)]" />
                       </div>
                       <span className="text-[10px] font-black text-[var(--text-main)] uppercase tracking-tight">{actorName}</span>
                     </div>
@@ -7747,12 +7747,12 @@ function HistoryEditTable({ logs, users }: { logs: HistoryEditProject[], users: 
                     <span className="text-[10px] font-bold text-[var(--text-sub)] uppercase tracking-tight">{log.field_name}</span>
                   </td>
                   <td className="px-6 py-3">
-                    <div className="max-w-[200px] truncate text-[10px] text-[var(--danger)]/60 line-through italic">
+                    <div className="max-w-[200px] truncate text-[10px] text-[var(--danger)]/80 line-through font-medium italic">
                        {log.before_value}
                     </div>
                   </td>
                   <td className="px-6 py-3">
-                    <div className="max-w-[200px] truncate text-[10px] text-[var(--success)] font-bold italic">
+                    <div className="max-w-[200px] truncate text-[10px] text-[var(--success)] font-black italic">
                        {log.after_value}
                     </div>
                   </td>
@@ -7769,7 +7769,7 @@ function HistoryEditTable({ logs, users }: { logs: HistoryEditProject[], users: 
 function AuditLogTable({ logs }: { logs: ProjectRescheduleLog[] }) {
   if (logs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-500 gap-3 border-2 border-dashed border-slate-800 rounded-3xl">
+      <div className="flex flex-col items-center justify-center py-20 text-[var(--text-sub)] gap-3 border-2 border-dashed border-[var(--border)] rounded-3xl">
         <History className="w-8 h-8 opacity-20" />
         <p className="text-[10px] font-black uppercase tracking-widest">No Reschedule Events Logged</p>
       </div>
@@ -7777,10 +7777,10 @@ function AuditLogTable({ logs }: { logs: ProjectRescheduleLog[] }) {
   }
 
   return (
-    <div className="overflow-hidden border border-[var(--border-subtle)] rounded-2xl bg-white shadow-sm">
+    <div className="overflow-hidden border border-[var(--border)] rounded-2xl bg-[var(--bg-card)] shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[800px]">
-          <thead className="bg-[var(--bg-main)] border-b border-[var(--border-subtle)]">
+          <thead className="bg-[var(--bg-page)] border-b border-[var(--border)]">
             <tr>
               <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest">Timestamp</th>
               <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest">Authorized By</th>
@@ -7789,40 +7789,40 @@ function AuditLogTable({ logs }: { logs: ProjectRescheduleLog[] }) {
               <th className="px-6 py-4 text-[9px] font-black text-[var(--text-sub)] uppercase tracking-widest">Reason / Justification</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-[var(--border)]">
             {logs.map((log, i) => (
-              <tr key={getSafeKey(log, i, 'resched-log')} className="hover:bg-white/[0.02] transition-colors">
+              <tr key={getSafeKey(log, i, 'resched-log')} className="hover:bg-[var(--bg-page)]/40 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
-                    <span className="text-xs text-slate-200 font-mono italic">{format(new Date(log.created_at), 'MMM dd, yyyy')}</span>
-                    <span className="text-[10px] text-slate-600 font-bold">{format(new Date(log.created_at), 'HH:mm:ss')}</span>
+                    <span className="text-xs text-[var(--text-main)] font-mono italic">{format(new Date(log.created_at), 'MMM dd, yyyy')}</span>
+                    <span className="text-[10px] text-[var(--text-sub)] font-black">{format(new Date(log.created_at), 'HH:mm:ss')}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-[10px] font-black text-indigo-400">
+                    <div className="w-6 h-6 rounded-full bg-[var(--accent)]/20 border border-[var(--accent)]/30 flex items-center justify-center text-[10px] font-black text-[var(--accent)]">
                       {log.changed_by?.charAt(0) || 'A'}
                     </div>
-                    <span className="text-xs font-bold text-slate-300">{log.changed_by}</span>
+                    <span className="text-xs font-black text-[var(--text-main)]">{log.changed_by}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4">
                    <div className="flex flex-col items-center gap-1 opacity-50">
-                      <span className="text-[9px] text-slate-400 font-mono">{log.old_start_date}</span>
-                      <ArrowDown className="w-3 h-3 text-slate-600" />
-                      <span className="text-[9px] text-slate-400 font-mono">{log.old_end_date}</span>
+                      <span className="text-[9px] text-[var(--text-sub)] font-mono font-bold">{log.old_start_date}</span>
+                      <ArrowDown className="w-3 h-3 text-[var(--text-sub)]/30" />
+                      <span className="text-[9px] text-[var(--text-sub)] font-mono font-bold">{log.old_end_date}</span>
                    </div>
                 </td>
                 <td className="px-6 py-4">
                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-[9px] text-emerald-400 font-black font-mono">{log.new_start_date}</span>
-                      <ArrowDown className="w-3 h-3 text-indigo-500" />
-                      <span className="text-[9px] text-emerald-400 font-black font-mono">{log.new_end_date}</span>
+                      <span className="text-[9px] text-[var(--success)] font-black font-mono">{log.new_start_date}</span>
+                      <ArrowDown className="w-3 h-3 text-[var(--accent)]" />
+                      <span className="text-[9px] text-[var(--success)] font-black font-mono">{log.new_end_date}</span>
                    </div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="p-3 bg-slate-950/50 rounded-xl border border-white/5 max-w-md">
-                     <p className="text-xs text-slate-400 leading-relaxed italic">"{log.reason}"</p>
+                  <div className="p-3 bg-[var(--bg-page)] rounded-xl border border-[var(--border)] max-w-md">
+                     <p className="text-[10px] text-[var(--text-sub)] leading-relaxed italic font-bold">"{log.reason}"</p>
                   </div>
                 </td>
               </tr>
