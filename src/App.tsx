@@ -344,6 +344,7 @@ const TaskStatusSelector = ({ status, onUpdate, disabled }: { status: any, onUpd
 };
 
 const ProjectStatusSelector = ({ status, onUpdate, disabled }: { status: any, onUpdate: (s: any) => void, disabled?: boolean }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const options = [
     ProjectStatus.TODO,
     ProjectStatus.IN_PROGRESS,
@@ -356,14 +357,30 @@ const ProjectStatusSelector = ({ status, onUpdate, disabled }: { status: any, on
     ProjectStatus.CANCEL,
     ProjectStatus.LATE
   ];
-  if (disabled) return <StatusBadge status={status} />;
+  
+  if (disabled || !isEditing) {
+    return (
+      <div 
+        onClick={() => !disabled && setIsEditing(true)}
+        className="cursor-pointer hover:scale-105 transition-transform"
+      >
+        <StatusBadge status={status} />
+      </div>
+    );
+  }
+
   return (
     <select 
+      autoFocus
+      onBlur={() => setIsEditing(false)}
       value={status || ProjectStatus.TODO}
-      onChange={(e) => onUpdate(e.target.value)}
+      onChange={(e) => {
+        onUpdate(e.target.value);
+        setIsEditing(false);
+      }}
       disabled={disabled}
       className={cn(
-        "bg-slate-900 border border-slate-800 rounded px-2 py-1 text-[9px] font-black uppercase outline-none transition-all cursor-pointer",
+        "bg-slate-900 border border-slate-800 rounded px-2 py-1 text-[9px] font-black uppercase outline-none transition-all cursor-pointer pointer-events-auto",
         status === ProjectStatus.LIVE ? "text-emerald-400" :
         (status === ProjectStatus.HOLD) ? "text-purple-400" :
         (status === ProjectStatus.CANCEL) ? "text-slate-500" :
@@ -1803,12 +1820,15 @@ export default function App() {
             </div>
             <h1 className="font-black text-[var(--text-main)] uppercase italic tracking-tighter text-lg leading-none transition-colors">OM <span className="text-indigo-500">DEDY</span></h1>
           </div>
-          <button 
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 text-[var(--text-sub)] hover:text-indigo-600 transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 text-[var(--text-sub)] hover:text-indigo-600 transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          </div>
         </header>
       )}
 

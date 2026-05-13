@@ -674,7 +674,7 @@ export const taskService = {
         continue;
       }
 
-      const existingRecord = existingMap.get(ticketId);
+      const existingRecord = existingMap.get(ticketId) as any;
 
       if (existingRecord) {
         // Branching Logic: REPLACE/UPDATE
@@ -689,7 +689,7 @@ export const taskService = {
 
         if (Object.keys(changes).length > 0) {
           stats.updated++;
-          stats.diffs.push({ ticket_id: ticketId, name: p.project_name || existingRecord.project_name, type: 'UPDATE', changes });
+          stats.diffs.push({ ticket_id: ticketId, name: (p as any).project_name || existingRecord.project_name, type: 'UPDATE', changes });
         } else {
           stats.skipped++;
         }
@@ -782,17 +782,17 @@ export const taskService = {
     const stats = { total: projects.length, updated: 0, inserted: 0, skipped: 0 };
     
     // 1. Get all existing master projects for comparison
-    const { data: existing } = await supabase.from('master_projects').select('*');
+    const { data: existing } = await supabase.from('master_projects').select('*') as { data: MasterProject[] | null };
     const existingMap = new Map((existing || []).map(p => [p.ticket_id, p]));
 
-    for (const p of projects) {
+    for (const p of projects as any[]) {
       const ticketId = String(p.ticket_id).trim();
       if (!ticketId) {
         stats.skipped++;
         continue;
       }
 
-      const existingRecord = existingMap.get(ticketId);
+      const existingRecord = existingMap.get(ticketId) as any;
 
       if (existingRecord) {
         // Branching Logic: REPLACE/UPDATE

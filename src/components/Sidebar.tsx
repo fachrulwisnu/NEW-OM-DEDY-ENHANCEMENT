@@ -116,7 +116,7 @@ export function Sidebar({
       </button>
 
       {/* Brand Header */}
-      <div className="h-20 flex items-center justify-between px-4 shrink-0 overflow-hidden">
+      <div className="h-20 flex items-center justify-between px-4 shrink-0 overflow-hidden pointer-events-auto">
         <div className="flex items-center">
           <div className="w-10 h-10 bg-[var(--accent)] rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-[rgba(67,24,255,0.2)] group cursor-pointer hover:rotate-12 transition-transform">
             <span className="text-lg font-black text-white">OD</span>
@@ -296,7 +296,7 @@ export function Sidebar({
             </button>
           </div>
         ) : user ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4 pointer-events-auto">
             <ThemeToggle />
             <button 
               onClick={onLogout}

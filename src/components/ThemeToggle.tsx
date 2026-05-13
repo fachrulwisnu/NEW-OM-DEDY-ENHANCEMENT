@@ -7,8 +7,11 @@ export const ThemeToggle = () => {
 
   return (
     <button
-      onClick={toggleTheme}
-      className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-page)] transition-colors duration-300 border border-[var(--border)] shadow-sm"
+      onClick={(e) => {
+        console.log('Theme toggle clicked');
+        toggleTheme();
+      }}
+      className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-page)] transition-colors duration-300 border border-[var(--border)] shadow-sm pointer-events-auto z-10"
       aria-label="Toggle Theme"
     >
       <Sun 
